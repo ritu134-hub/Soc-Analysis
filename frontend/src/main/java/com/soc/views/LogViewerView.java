@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -157,7 +158,11 @@ public class LogViewerView {
         Button clear = styledBtn("🗑️  Clear Logs", "#ff4d4d55", "#ff4d4d");
         clear.setOnAction(e -> clearLogs());
 
-        bar.getChildren().addAll(upload, searchField, severityFilter, search, analyse, liveToggle, clear);
+        // AI Explain
+        Button aiBtn = styledBtn("✨  Ask AI", "#8e44ad", "#ffffff");
+        aiBtn.setOnAction(e -> explainSelectedLog());
+
+        bar.getChildren().addAll(upload, searchField, severityFilter, search, analyse, liveToggle, clear, aiBtn);
 
         return bar;
     }
@@ -365,6 +370,114 @@ public class LogViewerView {
                 });
             }
         });
+    }
+
+    private void explainSelectedLog() {
+        LogRow selected = table.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            UIUtils.showToast(table, "Please select a log entry first.", "#ff8c00");
+            return;
+        }
+
+        String logMsg = selected.getMessage();
+        setStatus("✨ AI is analyzing the log...");
+        
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                String resp = ApiClient.explainLog(logMsg);
+                JsonObject obj = ApiClient.parseJson(resp);
+                String explanation = obj.get("explanation").getAsString();
+                
+                Platform.runLater(() -> {
+                    setStatus("✨ Analysis complete.");
+                    showAiDialog(selected, explanation);
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> setStatus("❌ AI Error: " + ex.getMessage()));
+            }
+        });
+    }
+
+    private void showAiDialog(LogRow log, String explanation) {
+        Stage dialog = new Stage();
+        dialog.setTitle("AI Security Analysis");
+        
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(25));
+        root.setStyle("-fx-background-color: #0d1117; -fx-border-color: #8e44ad; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
+        
+        Label title = new Label("✨ AI Security Analysis");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8e44ad;");
+        
+        VBox logBox = new VBox(5);
+        logBox.setStyle("-fx-background-color: #161b22; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #30363d; -fx-border-radius: 8;");
+        Label logLabel = new Label("Raw Log:");
+        logLabel.setStyle("-fx-text-fill: #8b949e; -fx-font-size: 11px; -fx-font-weight: bold;");
+        Label logText = new Label(log.getMessage());
+        logText.setStyle("-fx-text-fill: #e6edf3; -fx-font-size: 12px;");
+        logText.setWrapText(true);
+        logBox.getChildren().addAll(logLabel, logText);
+
+        ScrollPane scroll = new ScrollPane();
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(350);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-viewport-background: transparent;");
+        
+        VBox contentBox = new VBox(15);
+        contentBox.setPadding(new Insets(5, 0, 5, 0));
+        renderFormattedContent(contentBox, explanation);
+        scroll.setContent(contentBox);
+        
+        HBox footer = new HBox(10);
+        footer.setAlignment(Pos.CENTER_RIGHT);
+        Label badge = new Label("🛡️ AI VERIFIED ANALYSIS");
+        badge.setStyle("-fx-text-fill: #3fb950; -fx-font-size: 10px; -fx-font-weight: bold;");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button closeBtn = styledBtn("Dismiss", "#30363d", "#e6edf3");
+        closeBtn.setOnAction(e -> dialog.close());
+        UIUtils.applyHoverAnimation(closeBtn);
+        
+        footer.getChildren().addAll(badge, spacer, closeBtn);
+        root.getChildren().addAll(title, logBox, scroll, footer);
+        
+        Scene scene = new Scene(root, 600, 600);
+        dialog.setScene(scene);
+        dialog.show();
+    }
+
+    private void renderFormattedContent(VBox container, String text) {
+        String[] sections = text.split("(?=###|##|#|1\\.|2\\.|3\\.)");
+        
+        for (String section : sections) {
+            section = section.trim();
+            if (section.isEmpty()) continue;
+            
+            VBox card = new VBox(8);
+            card.setPadding(new Insets(12));
+            card.setStyle("-fx-background-color: #161b22; -fx-border-color: #30363d; -fx-border-radius: 8; -fx-background-radius: 8;");
+            
+            // Clean markdown and separate title/body
+            String[] lines = section.split("\n", 2);
+            String titleStr = lines[0].replaceAll("[#*]", "").trim();
+            String bodyStr = lines.length > 1 ? lines[1].trim() : "";
+            
+            if (titleStr.isEmpty() && bodyStr.isEmpty()) continue;
+
+            Label title = new Label(titleStr);
+            title.setStyle("-fx-text-fill: #8e44ad; -fx-font-weight: bold; -fx-font-size: 14px;");
+            
+            Label body = new Label(bodyStr.replaceAll("\\*\\*", ""));
+            body.setStyle("-fx-text-fill: #e6edf3; -fx-font-size: 12px;");
+            body.setWrapText(true);
+            
+            card.getChildren().addAll(title);
+            if (!bodyStr.isEmpty()) card.getChildren().add(body);
+            
+            container.getChildren().add(card);
+            UIUtils.showEntryAnimation(card, 300 + (container.getChildren().size() * 100));
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

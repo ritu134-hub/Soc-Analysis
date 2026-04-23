@@ -8,9 +8,10 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -282,13 +283,159 @@ public class DashboardView {
         text.getChildren().addAll(name, d);
         HBox.setHgrow(text, Priority.ALWAYS);
 
+        Button planBtn = new Button("✨ Plan");
+        planBtn.setStyle("-fx-background-color: #8e44ad22; -fx-text-fill: #8e44ad; -fx-font-size: 10px; -fx-padding: 3 8; -fx-background-radius: 4; -fx-cursor: hand;");
+        planBtn.setOnAction(e -> showMitigationPlan(rule, desc));
+        UIUtils.applyHoverAnimation(planBtn);
+
         Label sev = new Label(severity);
         sev.setStyle("-fx-background-color: " + color + "33; -fx-text-fill: " + color +
                      "; -fx-font-size: 10px; -fx-font-weight: bold; " +
                      "-fx-padding: 3 8 3 8; -fx-background-radius: 20;");
 
-        row.getChildren().addAll(dot, text, sev);
+        row.getChildren().addAll(dot, text, planBtn, sev);
         return row;
+    }
+
+    private void showMitigationPlan(String ruleName, String description) {
+        Stage dialog = new Stage();
+        dialog.setTitle("AI Mitigation Action Plan");
+
+        VBox root = new VBox(15);
+        root.setPadding(new Insets(25));
+        root.setStyle("-fx-background-color: #0d1117; -fx-border-color: #8e44ad; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
+
+        Label title = new Label("✨ AI Mitigation Action Plan");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8e44ad;");
+
+        VBox alertInfo = new VBox(5);
+        alertInfo.setStyle("-fx-background-color: #161b22; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #30363d; -fx-border-radius: 8;");
+        
+        HBox alertHeader = new HBox(10);
+        alertHeader.setAlignment(Pos.CENTER_LEFT);
+        Label alertStatus = new Label("LIVE THREAT");
+        alertStatus.setStyle("-fx-background-color: #ff4d4d22; -fx-text-fill: #ff4d4d; -fx-font-size: 9px; -fx-font-weight: bold; -fx-padding: 2 6; -fx-background-radius: 4;");
+        Label alertTitle = new Label(ruleName);
+        alertTitle.setStyle("-fx-text-fill: #e6edf3; -fx-font-weight: bold; -fx-font-size: 14px;");
+        alertHeader.getChildren().addAll(alertStatus, alertTitle);
+        
+        Label alertDesc = new Label(description);
+        alertDesc.setStyle("-fx-text-fill: #8b949e; -fx-font-size: 11px;");
+        alertDesc.setWrapText(true);
+        alertInfo.getChildren().addAll(alertHeader, alertDesc);
+
+        ScrollPane scroll = new ScrollPane();
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(300);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-viewport-background: transparent;");
+        
+        VBox stepsContainer = new VBox(12);
+        stepsContainer.setPadding(new Insets(5, 0, 5, 0));
+        
+        Label loading = new Label("✨ Analyzing threat and generating strategy...");
+        loading.setStyle("-fx-text-fill: #8e44ad; -fx-font-style: italic;");
+        stepsContainer.getChildren().add(loading);
+        
+        scroll.setContent(stepsContainer);
+
+        HBox footer = new HBox(10);
+        footer.setAlignment(Pos.CENTER_RIGHT);
+        
+        Label badge = new Label("🛡️ AI VERIFIED STRATEGY");
+        badge.setStyle("-fx-text-fill: #3fb950; -fx-font-size: 10px; -fx-font-weight: bold;");
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button closeBtn = new Button("Dismiss");
+        closeBtn.setStyle("-fx-background-color: #30363d; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;");
+        closeBtn.setOnAction(e -> dialog.close());
+        UIUtils.applyHoverAnimation(closeBtn);
+
+        footer.getChildren().addAll(badge, spacer, closeBtn);
+
+        root.getChildren().addAll(title, alertInfo, scroll, footer);
+
+        Scene scene = new Scene(root, 550, 550);
+        dialog.setScene(scene);
+        dialog.show();
+
+        // Async call to get the plan
+        Executors.newSingleThreadExecutor().submit(() -> {
+            try {
+                String resp = ApiClient.getMitigationPlan(ruleName, description);
+                JsonObject obj = ApiClient.parseJson(resp);
+                String plan = obj.get("plan").getAsString();
+                
+                Platform.runLater(() -> {
+                    stepsContainer.getChildren().clear();
+                    renderActionPlan(stepsContainer, plan);
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> {
+                    stepsContainer.getChildren().clear();
+                    Label err = new Label("❌ Error: " + ex.getMessage());
+                    err.setStyle("-fx-text-fill: #ff4d4d;");
+                    stepsContainer.getChildren().add(err);
+                });
+            }
+        });
+    }
+
+    private void renderActionPlan(VBox container, String rawPlan) {
+        // Simple parser for "1. **Title**: Description" or similar formats
+        String[] lines = rawPlan.split("\n");
+        int stepNum = 1;
+        
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty() || line.length() < 5) continue;
+            
+            // Clean up common markers
+            String cleanLine = line.replaceAll("^\\d+\\.\\s*", "").replaceAll("^[-*]\\s*", "");
+            
+            VBox card = new VBox(5);
+            card.setPadding(new Insets(12));
+            card.setStyle("-fx-background-color: #161b22; -fx-border-color: #30363d; -fx-border-radius: 8; -fx-background-radius: 8;");
+            
+            HBox header = new HBox(10);
+            header.setAlignment(Pos.CENTER_LEFT);
+            
+            Label circle = new Label(String.valueOf(stepNum++));
+            circle.setAlignment(Pos.CENTER);
+            circle.setPrefSize(24, 24);
+            circle.setStyle("-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 12;");
+            
+            // Try to split title and description if "**Title**:" exists
+            String titleStr = "Immediate Action";
+            String descStr = cleanLine;
+            
+            if (cleanLine.contains("**")) {
+                int first = cleanLine.indexOf("**");
+                int second = cleanLine.indexOf("**", first + 2);
+                if (second > first) {
+                    titleStr = cleanLine.substring(first + 2, second);
+                    descStr = cleanLine.substring(second + 1).replaceFirst("^:\\s*", "").trim();
+                }
+            }
+            
+            Label title = new Label(titleStr);
+            title.setStyle("-fx-text-fill: #e6edf3; -fx-font-weight: bold; -fx-font-size: 13px;");
+            
+            header.getChildren().addAll(circle, title);
+            
+            Label desc = new Label(descStr);
+            desc.setStyle("-fx-text-fill: #8b949e; -fx-font-size: 12px;");
+            desc.setWrapText(true);
+            
+            card.getChildren().addAll(header, desc);
+            container.getChildren().add(card);
+            
+            // Animation
+            UIUtils.showEntryAnimation(card, 200 + (stepNum * 100));
+            
+            if (stepNum > 4) break; // Limit to 3 steps as requested
+        }
     }
 
     private Label sectionLabel(String text) {

@@ -19,6 +19,7 @@ from routes.logs import router as logs_router
 from routes.analysis import router as analysis_router
 from routes.reports import router as reports_router
 from routes.live import router as live_router
+from routes.ai import router as ai_router
 
 
 # ── App ──────────────────────────────────────────────────────────────────────
@@ -48,6 +49,7 @@ app.include_router(logs_router)
 app.include_router(analysis_router)
 app.include_router(reports_router)
 app.include_router(live_router)
+app.include_router(ai_router)
 
 
 # ── Health ───────────────────────────────────────────────────────────────────

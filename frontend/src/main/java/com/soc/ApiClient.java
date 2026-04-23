@@ -153,6 +153,21 @@ public class ApiClient {
         return get("/live/status");
     }
 
+    // ── AI Endpoints ──────────────────────────────────────────────────────────
+
+    public static String explainLog(String message) throws IOException {
+        JsonObject body = new JsonObject();
+        body.addProperty("log_message", message);
+        return post("/api/ai/explain", GSON.toJson(body));
+    }
+
+    public static String getMitigationPlan(String alertName, String description) throws IOException {
+        JsonObject body = new JsonObject();
+        body.addProperty("alert_name", alertName);
+        body.addProperty("description", description);
+        return post("/api/ai/mitigate", GSON.toJson(body));
+    }
+
 
     // ── Convenience ───────────────────────────────────────────────────────────
 
