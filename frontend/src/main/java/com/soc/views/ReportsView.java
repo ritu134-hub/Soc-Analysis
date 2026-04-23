@@ -3,6 +3,7 @@ package com.soc.views;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.soc.ApiClient;
+import com.soc.UIUtils;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,6 +45,7 @@ public class ReportsView {
             "-fx-font-weight: bold; -fx-font-size: 14px; " +
             "-fx-padding: 12 24; -fx-background-radius: 9; -fx-cursor: hand;"
         );
+        UIUtils.applyHoverAnimation(generateBtn);
         generateBtn.setOnAction(e -> generateReport());
 
         Button refreshBtn = new Button("🔄  Refresh List");
@@ -52,6 +54,7 @@ public class ReportsView {
             "-fx-font-size: 13px; -fx-padding: 10 18; " +
             "-fx-background-radius: 8; -fx-cursor: hand;"
         );
+        UIUtils.applyHoverAnimation(refreshBtn);
         refreshBtn.setOnAction(e -> loadReports());
 
         genBar.getChildren().addAll(generateBtn, refreshBtn);
@@ -124,9 +127,15 @@ public class ReportsView {
                         none.setStyle("-fx-text-fill: #8b949e; -fx-font-size: 12px;");
                         reportsList.getChildren().add(none);
                     } else {
+                        int index = 0;
                         for (var el : reports) {
                             JsonObject r = el.getAsJsonObject();
-                            reportsList.getChildren().add(reportCard(r));
+                            Node card = reportCard(r);
+                            reportsList.getChildren().add(card);
+                            
+                            // Staggered entry animation for cards
+                            UIUtils.showEntryAnimation(card, 100 + (index * 80));
+                            index++;
                         }
                     }
                 });
@@ -206,6 +215,7 @@ public class ReportsView {
             "-fx-font-weight: bold; -fx-padding: 7 16; " +
             "-fx-background-radius: 7; -fx-cursor: hand;"
         );
+        UIUtils.applyHoverAnimation(openBtn);
         openBtn.setOnAction(e -> openReport(reportId));
 
         card.getChildren().addAll(icon, info, badge, openBtn);

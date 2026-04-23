@@ -3,6 +3,8 @@ package com.soc.views;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.soc.ApiClient;
+import com.soc.UIUtils;
+import javafx.animation.Animation;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,6 +36,7 @@ public class LogViewerView {
     private ComboBox<String> severityFilter;
     private int currentPage = 1;
     private long totalLogs  = 0;
+    private Animation pulseAnim;
 
     public Node build() {
         VBox root = new VBox(16);
@@ -124,11 +127,25 @@ public class LogViewerView {
                     ApiClient.startLiveMonitor();
                     liveToggle.setText("📡  Live Monitoring: ON");
                     liveToggle.setStyle("-fx-background-color: #4caf50; -fx-text-fill: #0d1117; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 7; -fx-cursor: hand;");
+                    
+                    if (pulseAnim != null) pulseAnim.stop();
+                    pulseAnim = UIUtils.createPulseAnimation(liveToggle);
+                    pulseAnim.play();
+                    
+                    UIUtils.showToast(liveToggle, "📡 Live Monitoring Started", "#2e7d32");
                     setStatus("📡 Live monitoring started. Scanning System & Network logs...");
                 } else {
                     ApiClient.stopLiveMonitor();
                     liveToggle.setText("📡  Live Monitoring: OFF");
                     liveToggle.setStyle("-fx-background-color: #30363d; -fx-text-fill: #8b949e; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 7; -fx-cursor: hand;");
+                    
+                    if (pulseAnim != null) {
+                        pulseAnim.stop();
+                        liveToggle.setScaleX(1.0);
+                        liveToggle.setScaleY(1.0);
+                    }
+                    
+                    UIUtils.showToast(liveToggle, "📡 Live Monitoring Stopped", "#c62828");
                     setStatus("📡 Live monitoring stopped.");
                 }
             } catch (Exception ex) {
@@ -366,6 +383,7 @@ public class LogViewerView {
             "-fx-font-weight: bold; -fx-padding: 8 16; " +
             "-fx-background-radius: 7; -fx-cursor: hand; -fx-font-size: 12px;"
         );
+        UIUtils.applyHoverAnimation(b);
         return b;
     }
 

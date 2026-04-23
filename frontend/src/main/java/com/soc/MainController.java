@@ -3,6 +3,7 @@ package com.soc;
 import com.soc.views.DashboardView;
 import com.soc.views.LogViewerView;
 import com.soc.views.ReportsView;
+import com.soc.UIUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,10 +22,13 @@ public class MainController {
     private BorderPane root;
     private StackPane contentArea;
 
-    // Views (lazy-loaded)
     private DashboardView dashboardView;
     private LogViewerView logViewerView;
     private ReportsView reportsView;
+
+    private Node dashboardNode;
+    private Node logViewerNode;
+    private Node reportsNode;
 
     public void show(Stage stage) {
         root = new BorderPane();
@@ -35,8 +39,7 @@ public class MainController {
         root.setCenter(contentArea);
 
         // Start on Dashboard
-        dashboardView = new DashboardView();
-        showView(dashboardView.build());
+        navigateTo(0);
 
         Scene scene = new Scene(root, 1280, 800);
         try {
@@ -104,30 +107,33 @@ public class MainController {
     private Button navButton(String text, int index) {
         Button btn = new Button(text);
         btn.setMaxWidth(Double.MAX_VALUE);
+        
+        // Base Style
         btn.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-text-fill: #8b949e;" +
-                "-fx-font-size: 13px;" +
-                "-fx-padding: 12 20 12 20;" +
-                "-fx-alignment: CENTER-LEFT;" +
-                "-fx-cursor: hand;"
+            "-fx-background-color: transparent; -fx-text-fill: #8b949e; " +
+            "-fx-font-size: 13px; -fx-padding: 12 20; -fx-alignment: CENTER-LEFT; " +
+            "-fx-cursor: hand;"
         );
-        btn.setOnMouseEntered(e -> btn.setStyle(
-                "-fx-background-color: #161b22;" +
-                "-fx-text-fill: #e6edf3;" +
-                "-fx-font-size: 13px;" +
-                "-fx-padding: 12 20 12 20;" +
-                "-fx-alignment: CENTER-LEFT;" +
+
+        // Transition colors on hover manually since we are using inline styles
+        btn.setOnMouseEntered(e -> {
+            btn.setStyle(
+                "-fx-background-color: #161b22; -fx-text-fill: #e6edf3; " +
+                "-fx-font-size: 13px; -fx-padding: 12 20; -fx-alignment: CENTER-LEFT; " +
                 "-fx-cursor: hand;"
-        ));
-        btn.setOnMouseExited(e -> btn.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-text-fill: #8b949e;" +
-                "-fx-font-size: 13px;" +
-                "-fx-padding: 12 20 12 20;" +
-                "-fx-alignment: CENTER-LEFT;" +
+            );
+        });
+        btn.setOnMouseExited(e -> {
+            btn.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: #8b949e; " +
+                "-fx-font-size: 13px; -fx-padding: 12 20; -fx-alignment: CENTER-LEFT; " +
                 "-fx-cursor: hand;"
-        ));
+            );
+        });
+
+        // Apply smooth scale animation
+        UIUtils.applyHoverAnimation(btn);
+        
         btn.setOnAction(e -> navigateTo(index));
         return btn;
     }
@@ -135,16 +141,19 @@ public class MainController {
     private void navigateTo(int index) {
         switch (index) {
             case 0 -> {
-                dashboardView = new DashboardView();
-                showView(dashboardView.build());
+                if (dashboardView == null) dashboardView = new DashboardView();
+                if (dashboardNode == null) dashboardNode = dashboardView.build();
+                showView(dashboardNode);
             }
             case 1 -> {
-                logViewerView = new LogViewerView();
-                showView(logViewerView.build());
+                if (logViewerView == null) logViewerView = new LogViewerView();
+                if (logViewerNode == null) logViewerNode = logViewerView.build();
+                showView(logViewerNode);
             }
             case 2 -> {
-                reportsView = new ReportsView();
-                showView(reportsView.build());
+                if (reportsView == null) reportsView = new ReportsView();
+                if (reportsNode == null) reportsNode = reportsView.build();
+                showView(reportsNode);
             }
         }
     }

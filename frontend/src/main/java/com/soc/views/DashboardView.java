@@ -3,6 +3,7 @@ package com.soc.views;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.soc.ApiClient;
+import com.soc.UIUtils;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,25 +37,38 @@ public class DashboardView {
         HBox statsRow = new HBox(16);
         statsRow.setAlignment(Pos.CENTER_LEFT);
         Label[] statValues = new Label[4];
-        statsRow.getChildren().addAll(
-            statCard("📋 Total Logs",    "—", "#58a6ff",  statValues, 0),
-            statCard("🚨 Threats Found", "—", "#ff4d4d",  statValues, 1),
-            statCard("⚠️ High Severity", "—", "#ff8c00",  statValues, 2),
-            statCard("📄 Reports",       "—", "#4caf50",  statValues, 3)
-        );
+        VBox card1 = statCard("📋 Total Logs",    "—", "#58a6ff",  statValues, 0);
+        VBox card2 = statCard("🚨 Threats Found", "—", "#ff4d4d",  statValues, 1);
+        VBox card3 = statCard("⚠️ High Severity", "—", "#ff8c00",  statValues, 2);
+        VBox card4 = statCard("📄 Reports",       "—", "#4caf50",  statValues, 3);
+        
+        statsRow.getChildren().addAll(card1, card2, card3, card4);
+        
+        // Entry Animations for Stats
+        UIUtils.showEntryAnimation(card1, 100);
+        UIUtils.showEntryAnimation(card2, 200);
+        UIUtils.showEntryAnimation(card3, 300);
+        UIUtils.showEntryAnimation(card4, 400);
 
         // Severity breakdown grid
         Label severityTitle = sectionLabel("Severity Breakdown");
         HBox severityGrid = new HBox(12);
         severityGrid.setAlignment(Pos.CENTER_LEFT);
         Label[] sevValues = new Label[5];
-        severityGrid.getChildren().addAll(
-            severityBadge("CRITICAL", "#ff4d4d", sevValues, 0),
-            severityBadge("HIGH",     "#ff8c00", sevValues, 1),
-            severityBadge("MEDIUM",   "#ffd700", sevValues, 2),
-            severityBadge("LOW",      "#4caf50", sevValues, 3),
-            severityBadge("INFO",     "#2196f3", sevValues, 4)
-        );
+        VBox b1 = severityBadge("CRITICAL", "#ff4d4d", sevValues, 0);
+        VBox b2 = severityBadge("HIGH",     "#ff8c00", sevValues, 1);
+        VBox b3 = severityBadge("MEDIUM",   "#ffd700", sevValues, 2);
+        VBox b4 = severityBadge("LOW",      "#4caf50", sevValues, 3);
+        VBox b5 = severityBadge("INFO",     "#2196f3", sevValues, 4);
+
+        severityGrid.getChildren().addAll(b1, b2, b3, b4, b5);
+        
+        // Entry Animations for Severity Badges
+        UIUtils.showEntryAnimation(b1, 500);
+        UIUtils.showEntryAnimation(b2, 550);
+        UIUtils.showEntryAnimation(b3, 600);
+        UIUtils.showEntryAnimation(b4, 650);
+        UIUtils.showEntryAnimation(b5, 700);
 
         // Top IPs section
         Label ipsTitle = sectionLabel("Top Source IPs");
@@ -79,6 +93,13 @@ public class DashboardView {
             alertsTitle, alertsBox,
             refresh
         );
+
+        // Animate the rest of the sections
+        UIUtils.showEntryAnimation(ipsTitle, 750);
+        UIUtils.showEntryAnimation(ipsBox, 800);
+        UIUtils.showEntryAnimation(alertsTitle, 850);
+        UIUtils.showEntryAnimation(alertsBox, 900);
+        UIUtils.showEntryAnimation(refresh, 950);
 
         // Auto-load on open
         loadData(statValues, sevValues, ipsBox, alertsBox);
@@ -288,6 +309,7 @@ public class DashboardView {
         btn.setStyle("-fx-background-color: " + color + "; -fx-text-fill: #0d1117; " +
                      "-fx-font-weight: bold; -fx-padding: 10 22 10 22; " +
                      "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-size: 13px;");
+        UIUtils.applyHoverAnimation(btn);
         return btn;
     }
 
