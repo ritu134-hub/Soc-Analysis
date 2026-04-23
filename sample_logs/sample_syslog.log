@@ -1,0 +1,34 @@
+Apr 23 02:15:01 webserver sshd[1234]: Failed password for root from 192.168.1.100 port 22 ssh2
+Apr 23 02:15:03 webserver sshd[1234]: Failed password for root from 192.168.1.100 port 22 ssh2
+Apr 23 02:15:05 webserver sshd[1234]: Failed password for root from 192.168.1.100 port 22 ssh2
+Apr 23 02:15:07 webserver sshd[1234]: Failed password for admin from 192.168.1.100 port 22 ssh2
+Apr 23 02:15:09 webserver sshd[1234]: Failed password for admin from 192.168.1.100 port 22 ssh2
+Apr 23 02:15:11 webserver sshd[1234]: Failed password for admin from 192.168.1.100 port 22 ssh2
+Apr 23 02:16:00 webserver sshd[1234]: Accepted password for sysadmin from 10.0.0.5 port 22 ssh2
+Apr 23 02:17:00 webserver sudo[5678]: sysadmin : TTY=pts/0 ; PWD=/home/sysadmin ; USER=root ; COMMAND=/bin/bash
+Apr 23 08:10:00 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=80
+Apr 23 08:10:01 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=443
+Apr 23 08:10:02 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=8080
+Apr 23 08:10:03 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=22
+Apr 23 08:10:04 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=3306
+Apr 23 08:10:05 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=5432
+Apr 23 08:10:06 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=6379
+Apr 23 08:10:07 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=27017
+Apr 23 08:10:08 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=9200
+Apr 23 08:10:09 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=9300
+Apr 23 08:10:10 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=2181
+Apr 23 09:00:00 webserver nginx[9999]: 172.16.0.10 - - [23/Apr/2026:09:00:00 +0000] "GET /index.html HTTP/1.1" 200 5123
+Apr 23 09:01:00 webserver nginx[9999]: 172.16.0.10 - - [23/Apr/2026:09:01:00 +0000] "POST /login HTTP/1.1" 200 322
+Apr 23 10:00:00 webserver clamav[2222]: FOUND Trojan.GenericKD.123456 in /tmp/upload.exe
+Apr 23 10:05:00 webserver sshd[1234]: Invalid user hacker from 185.220.101.5 port 44321
+Apr 23 10:05:01 webserver sshd[1234]: Failed password for invalid user hacker from 185.220.101.5 port 44321 ssh2
+Apr 23 10:05:02 webserver sshd[1234]: Failed password for invalid user hacker from 185.220.101.5 port 44321 ssh2
+Apr 23 10:05:03 webserver sshd[1234]: Failed password for invalid user hacker from 185.220.101.5 port 44321 ssh2
+Apr 23 10:05:04 webserver sshd[1234]: Failed password for invalid user hacker from 185.220.101.5 port 44321 ssh2
+Apr 23 10:05:05 webserver sshd[1234]: Failed password for invalid user hacker from 185.220.101.5 port 44321 ssh2
+Apr 23 11:00:00 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=1433
+Apr 23 11:00:01 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=1521
+Apr 23 11:00:02 webserver kernel: iptables BLOCKED: IN=eth0 OUT= SRC=203.0.113.50 DST=10.0.0.1 PROTO=TCP DPT=5000
+Apr 23 12:00:00 webserver systemd[1]: Started Apache HTTP Server.
+Apr 23 12:30:00 webserver kernel: Out of memory: Killed process 1234 (java) total-vm:2048000kB
+Apr 23 13:00:00 webserver sshd[1234]: session opened for user root by (uid=0) from 10.0.0.5

@@ -1,0 +1,17 @@
+[
+  {"timestamp": "2026-04-23T08:00:00", "source_ip": "10.0.0.10", "severity": "LOW",      "category": "Authentication", "message": "User alice logged in successfully"},
+  {"timestamp": "2026-04-23T08:05:00", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:05:01", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:05:02", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:05:03", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:05:04", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:05:05", "source_ip": "192.168.1.100", "severity": "HIGH", "category": "Authentication", "message": "Failed password for root from 192.168.1.100"},
+  {"timestamp": "2026-04-23T08:10:00", "source_ip": "203.0.113.99",  "severity": "CRITICAL", "category": "Malware",   "message": "Backdoor rootkit detected in /tmp/.hidden"},
+  {"timestamp": "2026-04-23T08:15:00", "source_ip": "10.0.0.5",      "severity": "MEDIUM",   "category": "Network",   "message": "Connection blocked from 10.0.0.5 port 8443"},
+  {"timestamp": "2026-04-23T09:00:00", "source_ip": "10.0.0.3",      "severity": "INFO",      "category": "System",   "message": "Scheduled backup started"},
+  {"timestamp": "2026-04-23T09:30:00", "source_ip": "10.0.0.4",      "severity": "HIGH",      "category": "Authentication", "message": "sudo su - root executed by user jenkins"},
+  {"timestamp": "2026-04-23T10:00:00", "source_ip": "172.16.50.10",  "severity": "CRITICAL",  "category": "Malware",  "message": "SQL injection attempt detected in request body"},
+  {"timestamp": "2026-04-23T11:00:00", "source_ip": "10.0.0.1",      "severity": "LOW",        "category": "System",  "message": "Nginx reloaded successfully"},
+  {"timestamp": "2026-04-23T22:30:00", "source_ip": "198.51.100.20", "severity": "MEDIUM",     "category": "Authentication", "message": "Accepted password for sysadmin from 198.51.100.20 at 22:30"},
+  {"timestamp": "2026-04-23T23:15:00", "source_ip": "198.51.100.20", "severity": "HIGH",       "category": "Authentication", "message": "session opened for user root from 198.51.100.20 outside business hours"}
+]

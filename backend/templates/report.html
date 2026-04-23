@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOC Analysis Report — {{ generated_at }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117; --card: #161b22; --border: #30363d;
+      --text: #e6edf3; --muted: #8b949e;
+      --critical: #ff4d4d; --high: #ff8c00; --medium: #ffd700;
+      --low: #4caf50; --info: #2196f3; --accent: #58a6ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 2rem; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 { font-size: 2.2rem; color: var(--accent); letter-spacing: 2px; }
+    header p  { color: var(--muted); margin-top: 0.4rem; font-size: 0.95rem; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-bottom: 2rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; margin-bottom: 2rem; }
+
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; text-align: center;
+    }
+    .stat-card .value { font-size: 2.5rem; font-weight: 700; color: var(--accent); }
+    .stat-card .label { color: var(--muted); margin-top: 0.4rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1.1rem; color: var(--accent); margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.6rem; }
+
+    canvas { max-height: 260px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead th { background: #1c2128; color: var(--muted); text-align: left; padding: 0.75rem 1rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+    tbody tr { border-top: 1px solid var(--border); }
+    tbody tr:hover { background: #1c2128; }
+    tbody td { padding: 0.75rem 1rem; vertical-align: top; word-break: break-word; max-width: 400px; }
+
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+    }
+    .badge-CRITICAL { background: rgba(255,77,77,0.2);  color: var(--critical); }
+    .badge-HIGH     { background: rgba(255,140,0,0.2);  color: var(--high); }
+    .badge-MEDIUM   { background: rgba(255,215,0,0.2);  color: var(--medium); }
+    .badge-LOW      { background: rgba(76,175,80,0.2);  color: var(--low); }
+    .badge-INFO     { background: rgba(33,150,243,0.2); color: var(--info); }
+
+    footer { text-align: center; margin-top: 3rem; color: var(--muted); font-size: 0.8rem; }
+
+    @media (max-width: 768px) {
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛡️ SOC Analysis Report</h1>
+  <p>Generated: {{ generated_at }} &nbsp;|&nbsp; Security Operations Center</p>
+</header>
+
+<!-- Summary Cards -->
+<div class="grid-3">
+  <div class="stat-card">
+    <div class="value">{{ log_count }}</div>
+    <div class="label">Total Log Entries</div>
+  </div>
+  <div class="stat-card">
+    <div class="value" style="color: {% if alert_count > 0 %}var(--critical){% else %}var(--low){% endif %}">{{ alert_count }}</div>
+    <div class="label">Threats Detected</div>
+  </div>
+  <div class="stat-card">
+    <div class="value" style="color: var(--medium)">{{ severity_dist.get('CRITICAL', 0) }}</div>
+    <div class="label">Critical Events</div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="grid-2">
+  <div class="card">
+    <h2>📊 Log Severity Distribution</h2>
+    <canvas id="severityChart"></canvas>
+  </div>
+  <div class="card">
+    <h2>📁 Events by Category</h2>
+    <canvas id="categoryChart"></canvas>
+  </div>
+</div>
+
+<!-- Top IPs -->
+{% if top_ips %}
+<div class="card">
+  <h2>🌐 Top Source IPs</h2>
+  <canvas id="ipChart" style="max-height:200px;"></canvas>
+</div>
+{% endif %}
+
+<!-- Alerts Table -->
+<div class="card">
+  <h2>🚨 Detected Threats & Alerts ({{ alerts|length }})</h2>
+  {% if alerts %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Rule</th><th>Severity</th><th>Source IP</th><th>Count</th><th>Description</th><th>Detected At</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in alerts %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ a.rule_name }}</strong></td>
+        <td><span class="badge badge-{{ a.severity }}">{{ a.severity }}</span></td>
+        <td>{{ a.source_ip or '—' }}</td>
+        <td>{{ a.count }}</td>
+        <td>{{ a.description }}</td>
+        <td style="color: var(--muted); font-size:0.8rem;">{{ a.detected_at }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color: var(--low); text-align:center; padding:2rem;">✅ No threats detected.</p>
+  {% endif %}
+</div>
+
+<!-- Recent Logs -->
+<div class="card">
+  <h2>📋 Recent Log Entries (Last 50)</h2>
+  <table>
+    <thead>
+      <tr><th>Timestamp</th><th>Severity</th><th>Category</th><th>Source IP</th><th>Message</th></tr>
+    </thead>
+    <tbody>
+      {% for log in recent_logs %}
+      <tr>
+        <td style="color:var(--muted);font-size:0.8rem;white-space:nowrap;">{{ log.timestamp }}</td>
+        <td><span class="badge badge-{{ log.severity }}">{{ log.severity }}</span></td>
+        <td>{{ log.category }}</td>
+        <td>{{ log.source_ip }}</td>
+        <td>{{ log.message }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  <p>SOC Analysis Tool &nbsp;|&nbsp; Confidential Security Report &nbsp;|&nbsp; {{ generated_at }}</p>
+</footer>
+
+<script>
+const severityColors = {
+  CRITICAL: '#ff4d4d', HIGH: '#ff8c00', MEDIUM: '#ffd700',
+  LOW: '#4caf50', INFO: '#2196f3'
+};
+const severityData = {{ severity_dist | tojson }};
+const categoryData = {{ categories | tojson }};
+const ipData       = {{ top_ips | tojson }};
+
+// Severity Donut
+new Chart(document.getElementById('severityChart'), {
+  type: 'doughnut',
+  data: {
+    labels: Object.keys(severityData),
+    datasets: [{
+      data: Object.values(severityData),
+      backgroundColor: Object.keys(severityData).map(k => severityColors[k] || '#888'),
+      borderWidth: 2, borderColor: '#161b22'
+    }]
+  },
+  options: { plugins: { legend: { labels: { color: '#e6edf3' } } } }
+});
+
+// Category Bar
+new Chart(document.getElementById('categoryChart'), {
+  type: 'bar',
+  data: {
+    labels: categoryData.map(d => d.category),
+    datasets: [{
+      label: 'Events',
+      data: categoryData.map(d => d.c),
+      backgroundColor: '#58a6ff88', borderColor: '#58a6ff',
+      borderWidth: 1, borderRadius: 6,
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+      y: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } }
+    }
+  }
+});
+
+// Top IPs Bar
+{% if top_ips %}
+new Chart(document.getElementById('ipChart'), {
+  type: 'bar',
+  data: {
+    labels: ipData.map(d => d.source_ip),
+    datasets: [{
+      label: 'Log Count',
+      data: ipData.map(d => d.c),
+      backgroundColor: '#ff4d4d55', borderColor: '#ff4d4d',
+      borderWidth: 1, borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#8b949e' }, grid: { color: '#30363d' } },
+      y: { ticks: { color: '#8b949e' }, grid: { display: false } }
+    }
+  }
+});
+{% endif %}
+</script>
+</body>
+</html>

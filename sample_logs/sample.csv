@@ -1,0 +1,26 @@
+timestamp,source_ip,severity,category,message
+2026-04-23T08:00:00,10.0.0.10,LOW,Authentication,User john logged in successfully
+2026-04-23T08:01:00,10.0.0.10,LOW,Authentication,Session opened for user john
+2026-04-23T08:05:00,192.168.1.200,HIGH,Authentication,Failed password for root
+2026-04-23T08:05:01,192.168.1.200,HIGH,Authentication,Failed password for root
+2026-04-23T08:05:02,192.168.1.200,HIGH,Authentication,Failed password for root
+2026-04-23T08:05:03,192.168.1.200,HIGH,Authentication,Failed password for admin
+2026-04-23T08:05:04,192.168.1.200,HIGH,Authentication,Failed password for admin
+2026-04-23T08:05:05,192.168.1.200,HIGH,Authentication,Failed password for admin
+2026-04-23T08:10:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 3306
+2026-04-23T08:11:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 5432
+2026-04-23T08:12:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 27017
+2026-04-23T08:13:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 6379
+2026-04-23T08:14:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 9200
+2026-04-23T08:15:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 1433
+2026-04-23T08:16:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 8080
+2026-04-23T08:17:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 443
+2026-04-23T08:18:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 80
+2026-04-23T08:19:00,10.1.1.50,MEDIUM,Network,Connection denied from 10.1.1.50 to port 22
+2026-04-23T09:00:00,172.16.0.5,CRITICAL,Malware,Ransomware payload detected in uploaded file upload.exe
+2026-04-23T09:05:00,172.16.0.5,CRITICAL,Malware,Exploit attempt blocked from 172.16.0.5
+2026-04-23T10:00:00,10.0.0.3,INFO,System,System backup completed successfully
+2026-04-23T10:30:00,10.0.0.4,LOW,Authentication,sudo su executed by user devops
+2026-04-23T11:00:00,10.0.0.4,HIGH,Authentication,Privilege escalation detected via sudo
+2026-04-23T12:00:00,10.0.0.1,INFO,System,Apache server started
+2026-04-23T13:00:00,10.0.0.2,LOW,System,Scheduled task completed

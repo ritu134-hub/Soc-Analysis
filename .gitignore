@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+.venv
+env/
+venv/
+backend/soc.db
+backend/reports/*.html
+
+# Java
+target/
+*.class
+.mvn/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+bin/
+
+# Maven (Portable)
+apache-maven-*/
+maven.zip
+maven_bin/
+
+# OS
+.DS_Store
+Thumbs.db
